@@ -1,0 +1,85 @@
+{
+  "name": "CoverBot 1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "convert",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        0
+      ],
+      "id": "481b2a3a-4df7-4592-b27b-f66b0cb42f21",
+      "name": "Webhook",
+      "webhookId": "5f9ba945-62e3-4f53-a811-ed2827a5900f"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write a professional and tailored cover letter for a job application using the following details:\n\n- Applicant Name: {{ $json.body.name }}\n- Job Title: {{ $json.body.job_title }}\n- Company: {{ $json.body.company_name }}\n- Key Skills: {{ $json.body.skills }}\n- Relevant Experience: {{ $json.body.experience }}\n- Tone/Style: {{ $json.body.tone }}\n\nRules:\n1. Use {{ $json.body.tone }} tone throughout.\n2. If the combined skills and experience are short (e.g., less than 3 items), write **2 short paragraphs** (opening + closing).\n3. If there is enough detail (e.g., more than 3 items), write **3 short paragraphs** (opening, body, closing).\n4. Start by mentioning the job title and company with a strong, personalized opening.\n5. Highlight only the most relevant skills and experience that align with the job.\n6. Include the applicant's name ({{ $json.body.name }}) in the closing section (e.g., “Sincerely, {{ $json.body.name }}”).\n8. Do NOT include address blocks or a date at the top. Start directly with the greeting.\n7. Keep the letter **under 250 words**."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -200,
+        0
+      ],
+      "id": "c90f0971-051b-497b-94a4-dda3c237071a",
+      "name": "OpenAI",
+      "alwaysOutputData": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "jlkfMKTOa0uenQUr",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "40533216-738b-433e-ae2f-bb33d8080c11",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b58af9b23ea6503889fbbd334186409b7b2c723202750c8a499d21420144b6fa"
+  },
+  "id": "sXOd6f51TH6Dhu7g",
+  "tags": []
+}
