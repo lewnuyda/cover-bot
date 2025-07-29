@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -16,32 +16,48 @@ import { supabase } from "../../api/supabaseClient";
 import { toSnakeCase } from "../../components/Utils/formatters";
 import { downloadDocx } from "../../components/Utils/downloadDocx";
 import TextArea from "../../components/UI/TextArea";
-
-// Validation schema using Yup
-const schema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
-  jobTitle: Yup.string().required("Job Title is required"),
-  companyName: Yup.string().required("Company Name is required"),
-  skills: Yup.string().required("Skills is required"), // <-- Add this
-  experience: Yup.string().required("Experience is required"), //
-  tone: Yup.string().required("Tone is required"), // <-- Add this
-});
+import CheckboxLabel from "../../components/UI/CheckBoxLabel";
 
 const CoverBot = () => {
+  const [isFreshGrad, setIsFreshGrad] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     document.title = "Cover Bot";
   }, []);
 
+  // ✅ Dynamic validation schema based on isFreshGrad
+  const validationSchema = useMemo(() => {
+    return Yup.object().shape({
+      name: Yup.string().required("Name is required"),
+      jobTitle: Yup.string().required("Job Title is required"),
+      companyName: Yup.string().required("Company Name is required"),
+      skills: Yup.string().required("Skills is required"),
+      experience: isFreshGrad
+        ? Yup.string().notRequired()
+        : Yup.string().required("Experience is required"),
+      freshGraduate: Yup.boolean(),
+      tone: Yup.string().required("Tone is required"),
+    });
+  }, [isFreshGrad]);
+
   const {
     register,
     handleSubmit,
-    control, // <-- ✅ add this line
+    control,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(validationSchema),
   });
-  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isFreshGrad) {
+      setValue("experience", ""); // ✅ Clear it if hidden
+    }
+  }, [isFreshGrad, setValue]);
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -53,7 +69,7 @@ const CoverBot = () => {
       console.log("Server response:", response.data.message.content);
 
       const coverLetter = response.data.message.content;
-      console.log("Generated Cover Letter:", coverLetter);
+      console.log("Generated Cover Letter:", payload);
 
       // Download Word file
       await downloadDocx(coverLetter);
@@ -61,6 +77,7 @@ const CoverBot = () => {
       showToast("success", "Your cover letter has been generated!");
 
       reset();
+      setIsFreshGrad(false); // Optional: reset checkbox
     } catch (error) {
       console.error("Error generating the cover letter:", error);
       // ❌ Show error toast
@@ -141,12 +158,34 @@ const CoverBot = () => {
               errorMessage={errors.skills?.message}
             />
           </div>
-          <div className="relative w-full min-w-[200px] mb-5">
-            <TextArea
-              name="experience"
-              label="Experience"
-              {...register("experience")}
-              error={errors.experience}
+          {!isFreshGrad && (
+            <div className="relative w-full min-w-[200px] mb-5">
+              <TextArea
+                name="experience"
+                label="Experience"
+                {...register("experience")}
+                error={errors.experience}
+              />
+            </div>
+          )}
+
+          <div className="mb-5 -mt-2">
+            <Controller
+              name="freshGraduate"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <CheckboxLabel
+                  label="I am a fresh graduate with no work experience"
+                  name="freshGraduate"
+                  checked={field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.checked); // register with react-hook-form
+                    setIsFreshGrad(e.target.checked); // update local state for Yup schema
+                  }}
+                  color="blue"
+                />
+              )}
             />
           </div>
 
