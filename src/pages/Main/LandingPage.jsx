@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect, useMemo } from "react";
 import jobHuntIllustration from "../../assets/job_hunt_re_q203.svg";
 
 import AppButton from "../../components/UI/AppButton";
@@ -19,6 +19,9 @@ const fadeInUp = {
 };
 
 const LandingPage = () => {
+  useEffect(() => {
+    document.title = "Cover Bot";
+  }, []);
   return (
     <section className="min-h-screen flex flex-col md:flex-row items-center justify-between gap-10 px-8 py-20 bg-indigo-50">
       {/* Image on the left */}
