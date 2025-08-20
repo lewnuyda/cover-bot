@@ -123,6 +123,7 @@ const CoverBot = () => {
               label="Your Name"
               name="name"
               type="text"
+              autoComplete="off"
               {...register("name")}
               error={!!errors.name}
               errorMessage={errors.name?.message}
@@ -132,6 +133,7 @@ const CoverBot = () => {
             <TextInput
               label="Job Title"
               name="jobTitle"
+              autoComplete="off"
               {...register("jobTitle")}
               error={!!errors.jobTitle}
               errorMessage={errors.jobTitle?.message}
@@ -143,6 +145,7 @@ const CoverBot = () => {
               label="Company Name"
               name="companyName"
               type="text"
+              autoComplete="off"
               {...register("companyName")}
               error={!!errors.companyName}
               errorMessage={errors.companyName?.message}
@@ -153,6 +156,7 @@ const CoverBot = () => {
               label="Skills"
               name="skills"
               type="text"
+              autoComplete="off"
               {...register("skills")}
               error={!!errors.skills}
               errorMessage={errors.skills?.message}
